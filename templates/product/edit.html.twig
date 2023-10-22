@@ -1,0 +1,22 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Modification d'un produit{% endblock %}
+
+{% form_theme myForm 'product/_collection.html.twig' %}
+
+{% block body %}
+    <div class="container">
+        <h1>Modifier un produit</h1>
+        {{form_start(myForm)}}
+            {{form_widget(myForm)}}
+            <button type="submit" class="btn btn-primary mt-3">Modifier le produit</button>
+        {{form_end(myForm)}}
+    </div>
+    
+
+{% endblock %}
+
+{% block javascripts %}
+    {# on a mit le contenu dans assets/js/ad.js pour ne pas se répéter et avoir uniquement un fichier qu'on répète #}
+    {{encore_entry_script_tags('product')}}
+{% endblock %}

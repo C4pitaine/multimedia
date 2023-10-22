@@ -3,14 +3,17 @@
 namespace App\Entity;
 
 use Cocur\Slugify\Slugify;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ProductRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 #[ORM\HasLifecycleCallbacks]
+#[UniqueEntity(fields:['name'],message:"Un autre produit possède ce nom merci de le modifier")]
 class Product
 {
     #[ORM\Id]
@@ -19,6 +22,7 @@ class Product
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Length(min:5,max:255,minMessage: "Le nom doit contenir minimum 5 caractères",maxMessage: "Le nom ne doit pas dépasser 255 caractères")]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
@@ -28,19 +32,27 @@ class Product
     private ?float $price = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\Length(min:100,minMessage: "Le nom  doit pas dépasser 100 caractères")]
     private ?string $description = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Length(min:5,max:255,minMessage: "Le type doit contenir minimum 5 caractères",maxMessage: "Le type ne doit pas dépasser 255 caractères")]
     private ?string $type = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Length(min:5,max:255,minMessage: "La marque doit contenir minimum 5 caractères",maxMessage: "La marque ne doit pas dépasser 255 caractères")]
     private ?string $marque = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Url(message: "Merci d'entrer une URL valide")]
     private ?string $coverImage = null;
 
     #[ORM\OneToMany(mappedBy: 'product', targetEntity: Image::class, orphanRemoval: true)]
     private Collection $images;
+
+    #[ORM\ManyToOne(inversedBy: 'products')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $author = null;
 
     public function __construct()
     {
@@ -178,6 +190,18 @@ class Product
                 $image->setProduct(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getAuthor(): ?User
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(?User $author): static
+    {
+        $this->author = $author;
 
         return $this;
     }

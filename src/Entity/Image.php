@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\ImageRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ImageRepository::class)]
 class Image
@@ -13,15 +14,17 @@ class Image
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'images')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Product $product = null;
-
     #[ORM\Column(length: 255)]
+    #[Assert\Url(message: "Merci de donner une URL valide")]
     private ?string $url = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Length(min:5, max: 255, minMessage:"Le titre doit dépasser 5 caractères",maxMessage:"Le titre ne doit pas dépasser 255 caractères")]
     private ?string $caption = null;
+
+    #[ORM\ManyToOne(inversedBy: 'images')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Product $product = null;
 
     public function getId(): ?int
     {
