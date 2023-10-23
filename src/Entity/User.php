@@ -10,9 +10,11 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\HasLifecycleCallbacks]
+#[UniqueIdentity(fields:['email'],message:"Cette adresse email est déjà utilisé")]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -21,6 +23,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
+    #[Assert\Email(message:"Veuillez donner une adresse email valide")]
     private ?string $email = null;
 
     #[ORM\Column]
@@ -30,21 +33,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[NotBlank(message:"Remplissage obligatoire")]
     private ?string $password = null;
 
+    #[Assert\EqualTo(propertyPath:"password", message:"Vous n'avez pas correctement confirmé votre mot de passe")]
+    public ?string $passwordConfirm = null;
+
     #[ORM\Column(length: 255)]
+    #[NotBlank(message:"Remplissage obligatoire")]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255)]
+    #[NotBlank(message:"Remplissage obligatoire")]
     private ?string $lastName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Url(message:"Veuillez donnez une url valide")]
     private ?string $picture = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Length(min:6,max:255,minMessage:"L'introduction doit dépasser 6 caractères",maxMessage:"L'introduction ne doit pas dépasser 255caractères")]
     private ?string $introduction = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\Length(min:100,minMessage:"La description doit dépasser 100 caractères")]
     private ?string $description = null;
 
     #[ORM\Column(length: 255)]
